@@ -37,7 +37,7 @@ def parse_samples(sample_file) :
 
 ##################### MAIN #####################
 
-def filter_input_vcf(sample, bed, vcf, output, threads) :
+def filter_input_vcf(sample, bed, vcf, threads, outdir) :
 
     output = os.path.join(outdir, sample + ".for_phasing.vcf")
     if os.path.exists(output) :
@@ -52,7 +52,7 @@ def filter_input_vcf(sample, bed, vcf, output, threads) :
 
     return output
 
-def run_extractHAIRS(bam, filtered_vcf) :
+def run_extractHAIRS(bam, filtered_vcf, outdir) :
 
     output = os.path.join(outdir, sample + ".fragments")
     if os.path.exists(output) :
@@ -66,7 +66,7 @@ def run_extractHAIRS(bam, filtered_vcf) :
 
     return output
 
-def run_HAPCUT2(fragments, filtered_vcf) :
+def run_HAPCUT2(fragments, filtered_vcf, outdir) :
 
     output = os.path.join(outdir, sample + ".hapcut2")
     if os.path.exists(output) :
@@ -116,12 +116,12 @@ def phase_vcf(args) :
 
         log("Sample {}/{}: {}".format(i, len(samples), sample))
         log("Phasing vcf...", ret = False) # No return char (line sticks to previous log/print line)
-        filtered_vcf = filter_input_vcf(sample, bed_file, vcf_file, output, threads)
+        filtered_vcf = filter_input_vcf(sample, bed_file, vcf_file, threads, outdir)
         log("Finished phasing vcf", ret = False)
         log("Running extractHAIRS", ret = False)
-        fragments = run_extractHAIRS(bam, filtered_vcf)
+        fragments = run_extractHAIRS(bam, filtered_vcf, outdir)
         log("Running HAPCUT2", ret = False)
-        run_HAPCUT2(fragments, filtered_vcf)
+        run_HAPCUT2(fragments, filtered_vcf, outdir)
         log("Finished HAPCUT2", ret = False)
 
         i += 1
