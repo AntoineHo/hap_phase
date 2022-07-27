@@ -52,7 +52,7 @@ def filter_input_vcf(sample, bed, vcf, threads, outdir) :
 
     return output
 
-def run_extractHAIRS(bam, filtered_vcf, outdir) :
+def run_extractHAIRS(sample, bam, filtered_vcf, outdir) :
 
     output = os.path.join(outdir, sample + ".fragments")
     if os.path.exists(output) :
@@ -66,7 +66,7 @@ def run_extractHAIRS(bam, filtered_vcf, outdir) :
 
     return output
 
-def run_HAPCUT2(fragments, filtered_vcf, outdir) :
+def run_HAPCUT2(sample, fragments, filtered_vcf, outdir) :
 
     output = os.path.join(outdir, sample + ".hapcut2")
     if os.path.exists(output) :
@@ -119,9 +119,9 @@ def phase_vcf(args) :
         filtered_vcf = filter_input_vcf(sample, bed_file, vcf_file, threads, outdir)
         log("Finished phasing vcf", ret = False)
         log("Running extractHAIRS", ret = False)
-        fragments = run_extractHAIRS(bam, filtered_vcf, outdir)
+        fragments = run_extractHAIRS(sample, bam, filtered_vcf, outdir)
         log("Running HAPCUT2", ret = False)
-        run_HAPCUT2(fragments, filtered_vcf, outdir)
+        run_HAPCUT2(sample, fragments, filtered_vcf, outdir)
         log("Finished HAPCUT2", ret = False)
 
         i += 1
