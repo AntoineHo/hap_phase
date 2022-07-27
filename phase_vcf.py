@@ -44,6 +44,7 @@ def filter_input_vcf(sample, bed, vcf, output, threads) :
     cmd = "bcftools view -Ov -R {bed} -s {sample} --threads {threads} -g het --exclude-uncalled -m2 -M2 -o {output} {vcf}"
     dc_args = {"bed":bed, "vcf":vcf, "sample":sample, "threads":threads, "output":output}
     cmd = cmd.format(**dc_args)
+    print(cmd)
     #run(cmd)
 
     return output
