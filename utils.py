@@ -5,7 +5,7 @@ import os
 import subprocess
 from time import localtime, strftime
 
-def log(string: str, bool: ret = True):
+def log(string: str, ret: bool = True):
     """Prints a log"""
     if ret :
         print("\n{}: {}".format(strftime("%Y-%m-%d %H:%M:%S", localtime()), string))
