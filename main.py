@@ -11,6 +11,11 @@
 import argparse
 import sys
 
+def phase_vcf(args) :
+    """Runs step 0 (filter)"""
+    from phase_vcf import phase_vcf
+    phase_vcf(args)
+
 def filter(args) :
     """Runs step 1 (filter)"""
     from filter import filter
@@ -46,7 +51,19 @@ def main() :
     parser = argparse.ArgumentParser(description='Runs steps (filter variants, extract regions, phase haplotypes, align haplotypes and concatenate haplotypes).')
     subparsers = parser.add_subparsers(required=True, dest="filter || extract || phase || group || align || concatenate")
 
-    # Trim Illumina short reads with fastp
+    # Run hapcut2
+    phv = subparsers.add_parser("phase_vcf", help='Run hapcut2 using samples .bam and .vcf file')
+    phv.add_argument('VCF',                  nargs=1, type=str,   help="<STRING> A phased VCF output of HapCut2.")
+    phv.add_argument('BED',                  nargs=1, type=str,   help="<STRING> A path to a .bed file with regions to phase.")
+    phv.add_argument('SAMPLES',              nargs=1, type=str,   help="<STRING> A path to a sample file list. Format one sample per line like: sample_name \t bam_file_path")
+    phv.add_argument('-t','--threads',       nargs=1, type=int,   default=[4], required=False, help="<INT> Threads to use. Default: >= %(default)s")
+    phv.add_argument('-o','--outdir',        nargs=1, type=str,   default=['out'], help="<STRING> path to the output directory. Default: %(default)s")
+    phv.set_defaults(func=phase_vcf)
+
+    #hap.add_argument('HAPCUT2',      nargs=1, type=str, help="<STRING> A path to HAPCUT2 executable.")
+    #hap.add_argument('extractHAIRS', nargs=1, type=str, help="<STRING> A path to HAPCUT2 executable.")
+
+    # Filter haplotype blocks
     fil = subparsers.add_parser("filter", help='Filter all valid haplotype blocks and outputs a .BED file.')
     fil.add_argument('FASTA',    nargs=1, type=str, help="<STRING> A fasta file containing the HAPLOID reference genome.")
     fil.add_argument('COV',      nargs=1, type=str, help="<STRING> A coverage file (from sambamba depth base) with all sites info from the reference.")
@@ -60,6 +77,7 @@ def main() :
     fil.add_argument('-o','--output', nargs=1, type=str, default=['out'],help="<STRING> prefix for the output files. Default: %(default)s")
     fil.set_defaults(func=filter)
 
+    # Extract maximum set of commonly phased haplotype blocks
     ext = subparsers.add_parser("extract", help='Find the maximum set of region phased in n samples.')
     ext.add_argument('DIR',     nargs=1, type=str, help="<STRING> Directory of the .bed files.")
     ext.add_argument('N',       nargs=1, type=int, help="<INT> Minimum number of samples phased to filter the regions.")
@@ -68,6 +86,7 @@ def main() :
     ext.add_argument('-o','--output',        nargs=1, type=str, default=['out'], help="<STRING> name for the output file. Default: %(default)s")
     ext.set_defaults(func=extract)
 
+    # Obtain a phased vcf from haploid reference using haplotype blocks
     pha = subparsers.add_parser("phase", help='Using an haploid reference, a phased .vcf and a region .bed file, outputs phased sequences.')
     pha.add_argument('FASTA',    nargs=1, type=str, help="<STRING> A fasta file containing the HAPLOID reference genome.")
     pha.add_argument('BED',      nargs=1, type=str, help="<STRING> A bed file containing the regions to try to phase.")
@@ -76,6 +95,7 @@ def main() :
     pha.add_argument('-o','--output', nargs=1, type=str, default=['out'],help="<STRING> prefix for the output files. Default: %(default)s")
     pha.set_defaults(func=phase)
 
+    # Get one fasta file per phased block
     gro = subparsers.add_parser("group", help='Takes a bed file and samples names and haplotypes then outputs one fasta per phased region.')
     gro.add_argument('FASTA',    nargs=1, type=str, help="<STRING> A fasta file containing the HAPLOID reference genome.")
     gro.add_argument('BED',      nargs=1, type=str, help="<STRING> A bed file containing the phased regions.")
@@ -86,17 +106,18 @@ def main() :
     gro.add_argument('-m','--min',    nargs=1, type=int, default=[20],  required=False, help="<INT> Minimum number of samples sharing the phased region. Default: >= %(default)s")
     gro.set_defaults(func=group)
 
+    # Align using mafft
     aln = subparsers.add_parser("align", help='Take phased fasta and align them using mafft.')
     aln.add_argument('DIR',    nargs=1, type=str, help="<STRING> A path to a directory containing phased regions folders.")
     aln.add_argument('OUTPUT', nargs=1, type=str, help="<STRING> A path to a directory for outputting files.")
     aln.set_defaults(func=align)
 
+    # Concatenate the sequences
     con = subparsers.add_parser("concat", help='Fetch all .mafft files and concatenate the sequences.')
     con.add_argument('DIR',     nargs=1, type=str, help="<STRING> Directory to search for all the .mafft files.")
     con.add_argument('-o','--output', nargs=1, type=str, default=['out'],help="<STRING> name for the output file. Default: %(default)s")
     con.add_argument('--samples', nargs='*', type=str, help="Sample names to concatenate.")
     con.set_defaults(func=concat)
-
 
     args = parser.parse_args()
     args.func(args)

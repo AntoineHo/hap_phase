@@ -5,9 +5,12 @@ import os
 import subprocess
 from time import localtime, strftime
 
-def log(string: str):
+def log(string: str, bool: ret = True):
     """Prints a log"""
-    print("\n{}: {}".format(strftime("%Y-%m-%d %H:%M:%S", localtime()), string))
+    if ret :
+        print("\n{}: {}".format(strftime("%Y-%m-%d %H:%M:%S", localtime()), string))
+    else :
+        print("{}: {}".format(strftime("%Y-%m-%d %H:%M:%S", localtime()), string))
 
 def run(cmd):
     proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
