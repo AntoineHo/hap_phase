@@ -65,10 +65,15 @@ def phase_vcf(args) :
     outdir = args.outdir[0]
     threads = args.threads[0]
 
+    if not os.path.exists(outdir) :
+        os.makedirs(outdir) # Create directory following path
+    else :
+        log("WARNING: Output directory already exists: {}.".format(outdir))
+
     print("# Hapcut2 runner tool")
-    print("Input VCF to phase:\t{0}".format(vcf))
-    print("Input BED with regions to phase:\t{0}".format(vcf))
-    print("Input sample list:\t{0}".format(samples))
+    print("Input VCF to phase:\t{0}".format(vcf_file))
+    print("Input BED with regions to phase:\t{0}".format(bed_file))
+    print("Input sample list:\t{0}".format(sample_file))
     print("Output path:\t\t{0}".format(outdir))
     print("Other parameters:")
     print("\t- Threads: {}".format(threads))
