@@ -43,12 +43,12 @@ def filter_input_vcf(sample, bed, vcf, threads, outdir) :
     if os.path.exists(output) :
         return output
 
-    print(output)
+    #print(output)
     cmd = "bcftools view -Ov -R {bed} -s {sample} --threads {threads} -g het --exclude-uncalled -m2 -M2 -o {output} {vcf}"
     dc_args = {"bed":bed, "vcf":vcf, "sample":sample, "threads":threads, "output":output}
     cmd = cmd.format(**dc_args)
-    print(cmd)
-    #run(cmd)
+    #print(cmd)
+    run(cmd)
 
     return output
 
@@ -61,8 +61,8 @@ def run_extractHAIRS(sample, bam, filtered_vcf, outdir) :
     cmd = "extractHAIRS --bam {bam} --VCF {vcf} --out {fragments}"
     dc_args = {"vcf":filtered_vcf, "bam":bam, "fragments":output}
     cmd = cmd.format(**dc_args)
-    print(cmd)
-    #run(cmd)
+    #print(cmd)
+    run(cmd)
 
     return output
 
@@ -75,8 +75,8 @@ def run_HAPCUT2(sample, fragments, filtered_vcf, outdir) :
     cmd = "HAPCUT2 --fragments {fragments} --VCF {vcf} --out {output} --outvcf 1"
     dc_args = {"vcf":filtered_vcf, "fragments":fragments, "output":output}
     cmd = cmd.format(**dc_args)
-    print(cmd)
-    #run(cmd)
+    #print(cmd)
+    run(cmd)
 
 def phase_vcf(args) :
     """Runs hapcut2: require bcftools, HAPCUT2 and extractHAIRS in $PATH"""
