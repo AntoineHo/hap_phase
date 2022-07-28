@@ -8,32 +8,7 @@ import subprocess
 
 # Modules
 from utils import log, run, which
-#from parsers import parse_bed
-
-##################### PARSING FILES #####################
-
-def parse_samples(sample_file) :
-    """Parse a sample file like: sample_name\tbam_file_path"""
-    samples = {}
-
-    f = open(sample_file, "r")
-    for line in f :
-        if line.startswith("#") :
-            continue
-
-        s = line.strip().split("\t")
-        sm = s[0]
-        bam = s[1]
-
-        if not os.path.exists(bam) :
-            log("ERROR: Could not find .bam filepath: {}".format(bam))
-            sys.exit(1)
-
-        samples[sm] = bam
-
-    f.close()
-
-    return samples
+from parsers import parse_samples
 
 ##################### MAIN #####################
 

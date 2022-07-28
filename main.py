@@ -11,7 +11,7 @@
 import argparse
 import sys
 
-def get_cov(args) :
+def coverage(args) :
     """Runs step 0 (get coverage per sample)"""
     from coverage import get_coverage
     get_coverage(args)
@@ -56,6 +56,13 @@ def main() :
     parser = argparse.ArgumentParser(description='Runs steps (filter variants, extract regions, phase haplotypes, align haplotypes and concatenate haplotypes).')
     subparsers = parser.add_subparsers(required=True, dest="filter || extract || phase || group || align || concatenate")
 
+    # Run sambamba to get coverage
+    cov = subparsers.add_parser("coverage", help='Run hapcut2 using samples .bam and .vcf file')
+    cov.add_argument('SAMPLES',              nargs=1, type=str,   help="<STRING> A path to a sample file list. Format one sample per line like: sample_name \t bam_file_path")
+    cov.add_argument('-t','--threads',       nargs=1, type=int,   default=[4], required=False, help="<INT> Threads to use. Default: >= %(default)s")
+    cov.add_argument('-o','--outdir',        nargs=1, type=str,   default=['out'], help="<STRING> path to the output directory. Default: %(default)s")
+    cov.set_defaults(func=coverage)
+
     # Run hapcut2
     phv = subparsers.add_parser("phase_vcf", help='Run hapcut2 using samples .bam and .vcf file')
     phv.add_argument('VCF',                  nargs=1, type=str,   help="<STRING> A phased VCF output of HapCut2.")
@@ -65,21 +72,17 @@ def main() :
     phv.add_argument('-o','--outdir',        nargs=1, type=str,   default=['out'], help="<STRING> path to the output directory. Default: %(default)s")
     phv.set_defaults(func=phase_vcf)
 
-    #hap.add_argument('HAPCUT2',      nargs=1, type=str, help="<STRING> A path to HAPCUT2 executable.")
-    #hap.add_argument('extractHAIRS', nargs=1, type=str, help="<STRING> A path to HAPCUT2 executable.")
-
     # Filter haplotype blocks
     fil = subparsers.add_parser("filter", help='Filter all valid haplotype blocks and outputs a .BED file.')
+    fil.add_argument('SAMPLES',  nargs=1, type=str, help="<STRING> A path to a sample file list. Format one sample per line like: sample_name \t bam_file_path")
     fil.add_argument('FASTA',    nargs=1, type=str, help="<STRING> A fasta file containing the HAPLOID reference genome.")
-    fil.add_argument('COV',      nargs=1, type=str, help="<STRING> A coverage file (from sambamba depth base) with all sites info from the reference.")
-    fil.add_argument('VCF',      nargs=1, type=str, help="<STRING> A phased VCF output of HapCut2.")
-    fil.add_argument('HAPCUT2',  nargs=1, type=str, help="<STRING> A phased block file output of HapCut2.")
-    fil.add_argument('SAMPLE',   nargs=1, type=str, help="<STRING> Sample name.")
+    fil.add_argument('COVDIR',   nargs=1, type=str, help="<STRING> A path to the output directory containing coverage files (from sambamba depth base).")
+    fil.add_argument('PHASEDIR', nargs=1, type=str, help="<STRING> A path to the output directory containing phased VCFs from HapCut2.")
     fil.add_argument('-ml','--min-length',   nargs=1, type=int,   default=[50],   required=False,help="<INT> Minimum length of phased region. Default: >= %(default)s")
     fil.add_argument('-mc','--min-cov',      nargs=1, type=int,   default=[25],   required=False,help="<INT> Minimum average coverage in phased block. Default: >= %(default)s")
     fil.add_argument('-ma','--min-af',       nargs=1, type=float, default=[0.35], required=False,help="<INT> Minimum average allele frequency in phased block. Default: >= %(default)s")
     fil.add_argument('-mmq','--min-mis-qual',nargs=1, type=int,   default=[20],   required=False,help="<INT> Minimum mismatch quality in phased block. Default: >= %(default)s")
-    fil.add_argument('-o','--output', nargs=1, type=str, default=['out'],help="<STRING> prefix for the output files. Default: %(default)s")
+    fil.add_argument('-o','--outdir', nargs=1, type=str, default=['out'],help="<STRING> prefix for the output files. Default: %(default)s")
     fil.set_defaults(func=filter)
 
     # Extract maximum set of commonly phased haplotype blocks

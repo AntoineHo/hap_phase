@@ -13,7 +13,7 @@ from pysam import VariantFile
 
 # Modules
 from utils import log
-from parsers import parse_fai, parse_bed
+from parsers import parse_fai, parse_bed, parse_samples
 
 # We have various informations from different files for !one! sample:
 # - Reference genome
@@ -162,11 +162,13 @@ def write_bed(valid, output) :
 def filter(args) :
     # IO
     reference = args.FASTA[0]
-    coverage_file = args.COV[0]
-    phased_blocks_hapcut2 = args.HAPCUT2[0]
-    phased_vcf = args.VCF[0]
-    sample = args.SAMPLE[0]
-    output = args.output[0]
+    sample_file = args.SAMPLES[0]
+    coverage_directory = args.COVDIR[0]
+    hapcut2_directory = args.PHASEDIR[0]
+    outdir = args.outdir[0]
+    #coverage_file = args.COV[0]
+    #phased_blocks_hapcut2 = args.HAPCUT2[0]
+    #phased_vcf = args.VCF[0]
 
     # PARAMS
     min_coverage = args.min_cov[0]
@@ -174,13 +176,17 @@ def filter(args) :
     min_mis_qual = args.min_mis_qual[0]
     min_len = args.min_length[0]
 
+    if not os.path.exists(outdir) :
+        os.makedirs(outdir) # Create directory following path
+    else :
+        log("WARNING: Output directory already exists: {}.".format(outdir))
 
     print("# Phasing tool")
     print("Haploid reference:\t{0}".format(reference))
-    print("Coverage of assembly:\t{0}".format(coverage_file))
-    print("HapCut2 phased VCF:\t{0}".format(phased_vcf))
-    print("HapCut2 phased blocks:\t{0}".format(phased_blocks_hapcut2))
-    print("Output path:\t\t{0}".format(output))
+    print("Input sample list:\t{0}".format(sample_file))
+    print("Coverage directory:\t{0}".format(coverage_directory))
+    print("Hapcut2 phasing directory:\t{0}".format(hapcut2_directory))
+    print("Output directory path:\t\t{0}".format(output))
     print("Other parameters:")
     print("\t- Minimum coverage: {}".format(min_coverage))
     print("\t- Minimum AF: {}".format(min_af))
@@ -189,28 +195,46 @@ def filter(args) :
         "===============================================================================\n"
     )
 
+    #print("Coverage of assembly:\t{0}".format(coverage_file))
+    #print("HapCut2 phased VCF:\t{0}".format(phased_vcf))
+    #print("HapCut2 phased blocks:\t{0}".format(phased_blocks_hapcut2))
+
     log("Parsing reference index...")
     try :
         lengths = parse_fai(reference + ".fai")
     except :
         raise Exception("Could not find fasta index (.fai) file.")
 
-    log("Parsing coverage...")
-    cov = parse_coverage(coverage_file)
+    samples = parse_samples(sample_file)
+    i = 1
+    for sample, bam in samples.items() :
 
-    log("Parsing VCF...")
-    vcf = parse_vcf(phased_vcf, sample)
+        log("Sample {}/{}: {}".format(i, len(samples), sample))
 
-    log("Parsing haplotype blocks...")
-    blocks = parse_haplotype_blocks(phased_blocks_hapcut2)
+        # Fetch files
+        coverage_file = os.path.join(coverage_directory, bam + ".cov.gz")
+        phased_vcf = os.path.join(hapcut2_directory, sample + ".hapcut2.phased.VCF")
+        block_files = os.path.join(hapcut2_directory, sample + ".hapcut2")
+        output = os.path.join(outdir, sample + ".phasing.bed")
 
-    log("Merging data...")
-    data = merge_information(blocks, vcf, cov, lengths)
+        log("Parsing coverage...")
+        cov = parse_coverage(coverage_file)
 
-    log("Filtering data...")
-    valid = filter_information(data, min_af, min_coverage, min_mis_qual, min_len)
+        log("Parsing VCF...")
+        vcf = parse_vcf(phased_vcf, sample)
 
-    log("Outputting valid blocks coordinates...")
-    write_bed(valid, output)
+        log("Parsing haplotype blocks...")
+        blocks = parse_haplotype_blocks(block_files)
 
-    log("Done!")
+        log("Merging data...")
+        data = merge_information(blocks, vcf, cov, lengths)
+
+        log("Filtering data...")
+        valid = filter_information(data, min_af, min_coverage, min_mis_qual, min_len)
+
+        log("Outputting valid blocks coordinates...")
+        write_bed(valid, output)
+
+        log("Done!")
+
+        i += 1
