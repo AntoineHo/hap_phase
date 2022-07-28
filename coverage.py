@@ -19,6 +19,7 @@ def run_sambamba(bam, outdir, threads) :
         cmd = "sambamba depth base -t {threads} --min-coverage=0 --min-base-quality=0 {bam} > {output}" #" | gzip --best > {output}"
         dc_args = {"threads":threads, "bam":bam, "output":output}
         cmd = cmd.format(**dc_args)
+        print(cmd)
         run(cmd)
 
     comp = output + ".gz"
