@@ -1,6 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+import os
+
 def parse_samples(sample_file) :
     """Parse a sample file like: sample_name\tbam_file_path"""
     samples = {}
