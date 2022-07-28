@@ -18,18 +18,21 @@ def run_sambamba(bam, outdir, threads) :
     output = os.path.join(outdir, bam_basename + ".cov")
     comp = output + ".gz"
 
-    if not os.path.exists(output) and not os.path.exists(comp) :
-        cmd = "sambamba depth base -t {threads} --min-coverage=0 --min-base-quality=0 {bam} > {output}" #" | gzip --best > {output}"
-        dc_args = {"threads":threads, "bam":bam, "output":output}
-        cmd = cmd.format(**dc_args)
-        print(cmd)
-        run(cmd)
-
     if not os.path.exists(comp) :
+        # Run sambamba if not run already
+        if not os.path.exists(output) :
+            cmd = "sambamba depth base -t {threads} --min-coverage=0 --min-base-quality=0 {bam} > {output}" #" | gzip --best > {output}"
+            dc_args = {"threads":threads, "bam":bam, "output":output}
+            cmd = cmd.format(**dc_args)
+            print(cmd)
+            run(cmd)
+
+        # Run gzip after sambamba
         cmd = "gzip --best {input} > {output}" #" | gzip --best > {output}"
         dc_args = {"input":output, "output":comp}
         cmd = cmd.format(**dc_args)
         run(cmd)
+        
     else :
         log("Found coverage file at: {}".format(comp), ret = False)
 
