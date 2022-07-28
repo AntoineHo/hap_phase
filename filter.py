@@ -145,10 +145,17 @@ def merge_information(blocks, vcf, cov, lengths) :
 def filter_information(df, min_af, min_cov, min_mis, min_len) :
 
     group_data = df.groupby(by="bid").agg({"bid":"first", "chr":"first", "pos":["min", "max"], "AF":"mean", "cov":"mean", "mis":"min", "inforeads":"mean", "al1":"min", "al2":"min"})
+    print(group_data)
+    print("-------------------------------------")
     group_data.columns = ["_".join(c for c in col) for col in group_data.columns]
+    print(group_data)
+    print("-------------------------------------")
     group_data = group_data.reset_index(drop=True)
+    print(group_data)
+    print("-------------------------------------")
     group_data = group_data.assign(length=group_data.apply(lambda x: x["pos_max"]-x["pos_min"], axis="columns"))
-
+    print(group_data)
+    print("-------------------------------------")
     valid_blocks = group_data.query("AF_mean >= @min_af & cov_mean >= @min_cov & al1_min >= 0 & al2_min >= 0 & mis_min >= @min_mis & length >= @min_len")
     return valid_blocks
 
