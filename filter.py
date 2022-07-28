@@ -186,7 +186,7 @@ def filter(args) :
     print("Input sample list:\t{0}".format(sample_file))
     print("Coverage directory:\t{0}".format(coverage_directory))
     print("Hapcut2 phasing directory:\t{0}".format(hapcut2_directory))
-    print("Output directory path:\t\t{0}".format(output))
+    print("Output directory path:\t\t{0}".format(outdir))
     print("Other parameters:")
     print("\t- Minimum coverage: {}".format(min_coverage))
     print("\t- Minimum AF: {}".format(min_af))
