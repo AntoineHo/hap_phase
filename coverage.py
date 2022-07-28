@@ -14,7 +14,7 @@ from parsers import parse_samples
 
 def run_sambamba(bam, outdir, threads) :
 
-    filename = os.basename(bam)
+    filename = os.path.basename(bam)
     print(filename)
     sys.exit(0)
     output = os.path.join(outdir, bam + ".cov")
