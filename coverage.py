@@ -14,18 +14,17 @@ from parsers import parse_samples
 
 def run_sambamba(bam, outdir, threads) :
 
-    filename = os.path.basename(bam)
-    print(filename)
-    sys.exit(0)
-    output = os.path.join(outdir, bam + ".cov")
-    if not os.path.exists(output) :
+    bam_basename = os.path.basename(bam)
+    output = os.path.join(outdir, bam_basename + ".cov")
+    comp = output + ".gz"
+
+    if not os.path.exists(output) and not os.path.exists(comp) :
         cmd = "sambamba depth base -t {threads} --min-coverage=0 --min-base-quality=0 {bam} > {output}" #" | gzip --best > {output}"
         dc_args = {"threads":threads, "bam":bam, "output":output}
         cmd = cmd.format(**dc_args)
         print(cmd)
         run(cmd)
 
-    comp = output + ".gz"
     if not os.path.exists(comp) :
         cmd = "gzip --best {input} > {output}" #" | gzip --best > {output}"
         dc_args = {"input":output, "output":comp}
