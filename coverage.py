@@ -14,6 +14,9 @@ from parsers import parse_samples
 
 def run_sambamba(bam, outdir, threads) :
 
+    filename = os.basename(bam)
+    print(filename)
+    sys.exit(0)
     output = os.path.join(outdir, bam + ".cov")
     if not os.path.exists(output) :
         cmd = "sambamba depth base -t {threads} --min-coverage=0 --min-base-quality=0 {bam} > {output}" #" | gzip --best > {output}"
