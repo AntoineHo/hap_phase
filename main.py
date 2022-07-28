@@ -22,39 +22,39 @@ def phase_vcf(args) :
     phase_vcf(args)
 
 def filter(args) :
-    """Runs step 1 (filter)"""
+    """Runs step 2 (filter)"""
     from filter import filter
     filter(args)
 
 def extract(args) :
-    """Runs step 2 (extract)"""
+    """Runs step 3 (extract)"""
     from extract import extract
     extract(args)
 
 def phase(args) :
-    """Runs step 3 (phase)"""
+    """Runs step 4 (phase)"""
     from phase import phase
     phase(args)
 
 def group(args) :
-    """Runs step 4 (group)"""
+    """Runs step 5 (group)"""
     from group import group
     group(args)
 
 def align(args) :
-    """Runs step 5 (align)"""
+    """Runs step 6 (align)"""
     from align import align
     align(args)
 
 def concat(args) :
-    """Runs step 6 (concatenate)"""
+    """Runs step 7 (concatenate)"""
     from concat import concat
     concat(args)
 
 def main() :
     """Argument parser"""
     parser = argparse.ArgumentParser(description='Runs steps (filter variants, extract regions, phase haplotypes, align haplotypes and concatenate haplotypes).')
-    subparsers = parser.add_subparsers(required=True, dest="filter || extract || phase || group || align || concatenate")
+    subparsers = parser.add_subparsers(required=True, dest="coverage || phase_vcf || filter || extract || phase || group || align || concatenate")
 
     # Run sambamba to get coverage
     cov = subparsers.add_parser("coverage", help='Run hapcut2 using samples .bam and .vcf file')
