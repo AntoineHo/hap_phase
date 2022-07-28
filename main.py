@@ -11,8 +11,13 @@
 import argparse
 import sys
 
+def get_cov(args) :
+    """Runs step 0 (get coverage per sample)"""
+    from coverage import get_coverage
+    get_coverage(args)
+
 def phase_vcf(args) :
-    """Runs step 0 (filter)"""
+    """Runs step 1 (phase a VCF per sample)"""
     from phase_vcf import phase_vcf
     phase_vcf(args)
 
