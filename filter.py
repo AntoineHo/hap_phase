@@ -219,7 +219,8 @@ def filter(args) :
         log("Sample {}/{}: {}".format(i, len(samples), sample))
 
         # Fetch files
-        coverage_file = os.path.join(coverage_directory, bam + ".cov.gz")
+        bam_filename = os.path.basename(bam)
+        coverage_file = os.path.join(coverage_directory, bam_filename + ".cov.gz")
         phased_vcf = os.path.join(hapcut2_directory, sample + ".hapcut2.phased.VCF")
         block_files = os.path.join(hapcut2_directory, sample + ".hapcut2")
         output = os.path.join(outdir, sample + ".phasing.bed")
