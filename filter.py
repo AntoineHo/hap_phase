@@ -145,17 +145,17 @@ def merge_information(blocks, vcf, cov, lengths) :
 def filter_information(df, min_af, min_cov, min_mis, min_len) :
 
     group_data = df.groupby(by="bid").agg({"bid":"first", "chr":"first", "pos":["min", "max"], "AF":"mean", "cov":"mean", "mis":"min", "inforeads":"mean", "al1":"min", "al2":"min"})
-    print(group_data)
-    print("-------------------------------------")
+    #print(group_data)
+    #print("-------------------------------------")
     group_data.columns = ["_".join(c for c in col) for col in group_data.columns]
-    print(group_data)
-    print("-------------------------------------")
+    #print(group_data)
+    #print("-------------------------------------")
     group_data = group_data.reset_index(drop=True)
-    print(group_data)
-    print("-------------------------------------")
+    #print(group_data)
+    #print("-------------------------------------")
     group_data = group_data.assign(length=group_data.apply(lambda x: x["pos_max"]-x["pos_min"], axis="columns"))
-    print(group_data)
-    print("-------------------------------------")
+    #print(group_data)
+    #print("-------------------------------------")
     valid_blocks = group_data.query("AF_mean >= @min_af & cov_mean >= @min_cov & al1_min >= 0 & al2_min >= 0 & mis_min >= @min_mis & length >= @min_len")
     return valid_blocks
 
@@ -225,26 +225,30 @@ def filter(args) :
         block_files = os.path.join(hapcut2_directory, sample + ".hapcut2")
         output = os.path.join(outdir, sample + ".phasing.bed")
 
-        log("Parsing coverage...")
+        if os.path.exists(output) :
+            log("SKIPPING: Found output file: {}".format(output), ret = False)
+            continue
+
+        log("Parsing coverage...", ret = False)
         cov = parse_coverage(coverage_file)
-        print(cov)
+        #print(cov)
 
-        log("Parsing VCF...")
+        log("Parsing VCF...", ret = False)
         vcf = parse_vcf(phased_vcf, sample)
-        print(vcf)
+        #print(vcf)
 
-        log("Parsing haplotype blocks...")
+        log("Parsing haplotype blocks...", ret = False)
         blocks = parse_haplotype_blocks(block_files)
-        print(blocks)
+        #print(blocks)
 
-        log("Merging data...")
+        log("Merging data...", ret = False)
         data = merge_information(blocks, vcf, cov, lengths)
-        print(data)
+        #print(data)
 
-        log("Filtering data...")
+        log("Filtering data...", ret = False)
         valid = filter_information(data, min_af, min_coverage, min_mis_qual, min_len)
 
-        log("Outputting valid blocks coordinates...")
+        log("Outputting valid blocks coordinates...", ret = False)
         write_bed(valid, output)
 
         log("Done!")
