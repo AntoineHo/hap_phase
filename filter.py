@@ -226,15 +226,19 @@ def filter(args) :
 
         log("Parsing coverage...")
         cov = parse_coverage(coverage_file)
+        print(cov)
 
         log("Parsing VCF...")
         vcf = parse_vcf(phased_vcf, sample)
+        print(vcf)
 
         log("Parsing haplotype blocks...")
         blocks = parse_haplotype_blocks(block_files)
+        print(blocks)
 
         log("Merging data...")
         data = merge_information(blocks, vcf, cov, lengths)
+        print(data)
 
         log("Filtering data...")
         valid = filter_information(data, min_af, min_coverage, min_mis_qual, min_len)
