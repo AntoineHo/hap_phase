@@ -64,8 +64,11 @@ def maximally_phased_dataset(bed_dir, output, lengths, n, min_length=100) :
 
     new_bed_data = []
     for chrom, regions in arrays.items() :
-        print(chrom)
+
         pos = np.argwhere(regions >= n) # (0-based) positions of regions phased in more than min_sample
+        if len(pos) == 0 :
+            print("Warning: could not find at least {} samples phased on contig {}".format(n, chrom))
+            continue
         transpos = pos.transpose()[0] # linearize new array
 
         # Groupby contiguous values
