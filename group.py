@@ -76,7 +76,7 @@ def parse_samples(sampledir) :
         if not os.path.isfile(hap1) or not os.path.isfile(hap2) :
             raise Exception("Could not find haplotype path for sample {}".format(sample))
         else :
-            samples[sample] = (sample_path, hap1, hap2)
+            samples[sample] = (sampledir, hap1, hap2)
     return samples
 
 def write_fasta(filename, samples, reg, sample_list) :
