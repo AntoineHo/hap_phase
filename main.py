@@ -106,7 +106,7 @@ def main() :
     gro = subparsers.add_parser("group", help='Takes a bed file and samples names and haplotypes then outputs one fasta per phased region.')
     gro.add_argument('FASTA',    nargs=1, type=str, help="<STRING> A fasta file containing the HAPLOID reference genome.")
     gro.add_argument('BED',      nargs=1, type=str, help="<STRING> A bed file containing the phased regions.")
-    gro.add_argument('SAMPLES',  nargs=1, type=str, help="<STRING> Samples to compare.")
+    #gro.add_argument('SAMPLES',  nargs=1, type=str, help="<STRING> Samples to compare.")
     gro.add_argument('SAMPLEDIR',nargs=1, type=str, help="<STRING> Path to directory containing samples.")
     gro.add_argument('OUTPUT',   nargs=1, type=str, help="<STRING> A path to a directory for outputting files.")
     gro.add_argument('-l','--length', nargs=1, type=int, default=[100], required=False, help="<INT> Minimum length. Default: >= %(default)s")
