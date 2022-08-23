@@ -58,17 +58,22 @@ def compare_samples(regions, samples) :
 
     return hap_counts, hap_lengths
 
-def parse_samples(sample_string, sampledir) :
+def parse_samples(sampledir) :
     """scrape phased fasta files for samples"""
+
+    names = []
+    for fl in os.listdir(sampledir) :
+        if fl.endswith(".phased.vcf") :
+            sample_name = fl.split(".")[0]
+            names.append(sample_name)
+        else :
+            continue
+
     samples = {}
-    wd = os.getcwd()
-    for sample in sample_string.split(",") :
-        sample_path = os.path.join(sampledir, sample)
-        hap1 = os.path.join(sample_path, sample + ".hap1.fa")
-        hap2 = os.path.join(sample_path, sample + ".hap2.fa")
-        if not os.path.isdir(sample_path) :
-            raise Exception("Could not find directory {}".format(sample_path))
-        elif not os.path.isfile(hap1) or not os.path.isfile(hap2) :
+    for sample in names :
+        hap1 = os.path.join(sampledir, sample + ".hap1.fa")
+        hap2 = os.path.join(sampledir, sample + ".hap2.fa")
+        if not os.path.isfile(hap1) or not os.path.isfile(hap2) :
             raise Exception("Could not find haplotype path for sample {}".format(sample))
         else :
             samples[sample] = (sample_path, hap1, hap2)
@@ -108,8 +113,8 @@ def group(args) :
 
     ref = parse_fasta(args.FASTA[0])
     reg = parse_bed(args.BED[0])
-    samples = parse_samples(args.SAMPLES[0], args.SAMPLEDIR[0])
-    maxsm = len(args.SAMPLES[0].split(","))
+    samples = parse_samples(args.SAMPLEDIR[0])
+    maxsm = len(samples)
     #print(maxsm)
     #print(reg[0:3])
 
