@@ -86,7 +86,7 @@ def concat(args) :
 
     log("Finding all samples...")
     vcfs = [os.path.join(sample_dir, file) for file in os.listdir(sample_dir) if file.endswith(".phased.vcf")]
-    names = [os.path.basename(fl).split(".")[0] for fl in vcfs]
+    samples = [os.path.basename(fl).split(".")[0] for fl in vcfs]
 
     log("Finding .mafft files in directory...")
     mafft_files = [os.path.join(directory, fl) for fl in os.listdir(directory) if fl.endswith(".mafft")]
