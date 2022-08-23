@@ -203,8 +203,9 @@ def write_new_vcf(output, phased_vcf, new_sequences, only_phased) : # Need pysam
         # update the coordinates
         data = lines.copy()
         print(data.head())
-        data.loc[:]["pos"] = data.loc[:]["pos"] - (start-1) # since start is 1-based, we must substract start-1
-        data.loc[:]["ctg"].replace({chrom:new_sequence_name}, inplace=True)
+        #data.loc[:]["pos"] = data.loc[:]["pos"] - (start-1) # since start is 1-based, we must substract start-1
+        data["pos"] -= (start-1) # 1-based
+        data["ctg"].replace({chrom:new_sequence_name}, inplace=True)
         print(data.head())
         new_blocks.append(data)
 
