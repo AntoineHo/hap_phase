@@ -322,6 +322,7 @@ def phase(args) :
         write_new_vcf(vcf_out, phased_vcf, new_seqs, only_phased)
 
         log("{} ({}/{}): Running bcftools consensus...".format(sm, i, t)) # sample wise
+        output = os.path.join(outdir, sm)
         run_bcftools(output, fa_out, vcf_out)
 
         i += 1
