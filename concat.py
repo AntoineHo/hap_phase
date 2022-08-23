@@ -86,12 +86,7 @@ def concat(args) :
     print(samples)
 
     log("Finding .mafft files in directory...")
-    mafft_files = []
-    for dirpath, dirs, files in os.walk(directory):
-        for filename in files :
-            filepath = os.path.join(dirpath, filename)
-            if filepath.endswith(".mafft") :
-                mafft_files.append(filepath)
+    mafft_files = [os.path.join(directory, fl) for fl in os.listdir(directory) if fl.endswith(".mafft")]
 
     log("Reading mafft files...")
     all_sequences = []
