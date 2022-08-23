@@ -19,7 +19,7 @@ from parsers import parse_bed, parse_fasta_generic
 def parse_samples(phasedir) :
     # format: {sample: {vcf:vcf, blocks:blocks}}
 
-    files = [os.path.join(phasedir, file) for file in os.listdir(phasedir)]
+    files = os.listdir(phasedir)
 
     # Fetch sample names
     sample_names = []
