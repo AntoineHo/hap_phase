@@ -79,11 +79,14 @@ def concat(args) :
 
     # IO
     directory = args.DIR[0]
+    sample_dir = args.SAMPLEDIR[0]
     output = args.output[0]
-    samples = args.samples
 
     haplotypes = []
-    print(samples)
+
+    log("Finding all samples...")
+    vcfs = [os.path.join(sample_dir, file) for file in os.listdir(sample_dir) if file.endswith(".phased.vcf")]
+    names = [os.path.basename(fl).split(".")[0] for fl in vcfs]
 
     log("Finding .mafft files in directory...")
     mafft_files = [os.path.join(directory, fl) for fl in os.listdir(directory) if fl.endswith(".mafft")]
