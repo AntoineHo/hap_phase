@@ -19,26 +19,26 @@ from parsers import parse_bed, parse_fasta_generic
 def parse_samples(phasedir) :
     # format: {sample: {vcf:vcf, blocks:blocks}}
 
-    files = os.listdir(phasedir)
+    files = [os.path.join(phasedir, file) for file in os.listdir(phasedir)]
 
     # Fetch sample names
-    sample_names = []
+    names = []
     for fl in files :
         if fl.endswith(".fragments") :
-            sample = fl.split(".")[0]
-            sample_names.append(sample)
+            sample_name = os.path.basename(fl).split(".")[0]
+            names.append(sample_name)
         else :
             continue
 
     # Fetch sample files
-    samples = {sm:{} for sm in sample_names}
+    samples = {sm:{} for sm in names}
     for fl in files :
         if fl.endswith(".hapcut2") :
-            sample = fl.split(".")[0]
-            samples[sample]["blocks"] = fl
+            sample_name = os.path.basename(fl).split(".")[0]
+            samples[sample_name]["blocks"] = fl
         elif fl.endswith(".hapcut2.phased.VCF") :
-            sample = fl.split(".")[0]
-            samples[sample]["vcf"] = fl
+            sample_name = os.path.basename(fl).split(".")[0]
+            samples[sample_name]["vcf"] = fl
         else :
             continue
 
