@@ -35,10 +35,10 @@ def parse_samples(phasedir) :
     for fl in files :
         if fl.endswith(".hapcut2") :
             sample = fl.split(".")[0]
-            samples[sample]["vcf"] = fl
+            samples[sample]["blocks"] = fl
         elif fl.endswith(".hapcut2.phased.VCF") :
             sample = fl.split(".")[0]
-            samples[sample]["blocks"] = fl
+            samples[sample]["vcf"] = fl
         else :
             continue
 
