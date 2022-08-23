@@ -121,9 +121,9 @@ def main() :
 
     # Concatenate the sequences
     con = subparsers.add_parser("concat", help='Fetch all .mafft files and concatenate the sequences.')
-    con.add_argument('DIR',     nargs=1, type=str, help="<STRING> Directory to search for all the .mafft files.")
+    con.add_argument('DIR',       nargs=1, type=str, help="<STRING> Directory to search for all the .mafft files.")
+    con.add_argument('SAMPLEDIR', nargs=1, type=str, help="<STRING> Directory to search for all the .phased.vcf files.")
     con.add_argument('-o','--output', nargs=1, type=str, default=['out'],help="<STRING> name for the output file. Default: %(default)s")
-    con.add_argument('--samples', nargs='*', type=str, help="Sample names to concatenate.")
     con.set_defaults(func=concat)
 
     args = parser.parse_args()
