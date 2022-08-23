@@ -272,6 +272,11 @@ def phase(args) :
     phase_outdir = args.VCF[0]
     outdir = args.outdir[0]
 
+    if not os.path.exists(outdir) :
+        os.makedirs(outdir) # Create directory following path
+    else :
+        log("WARNING: Output directory already exists: {}.".format(outdir))
+
     print("# Phasing tool")
     print("Haploid reference:\t{0}".format(reference))
     print("Regions to phase:\t{0}".format(bed_file))
@@ -318,5 +323,5 @@ def phase(args) :
 
         log("{} ({}/{}): Running bcftools consensus...".format(sm, i, t)) # sample wise
         run_bcftools(output, fa_out, vcf_out)
-        
+
         i += 1
