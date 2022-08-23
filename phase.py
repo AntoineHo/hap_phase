@@ -16,6 +16,34 @@ from parsers import parse_bed, parse_fasta_generic
 
 ##################### PARSING FILES #####################
 
+def parse_samples(phasedir) :
+    # format: {sample: {vcf:vcf, blocks:blocks}}
+
+    files = [os.path.join(phasedir, file) for file in os.listdir(phasedir)]
+
+    # Fetch sample names
+    sample_names = []
+    for fl in files :
+        if fl.endswith(".fragments") :
+            sample = fl.split(".")[0]
+            sample_names.append(sample)
+        else :
+            continue
+
+    # Fetch sample files
+    samples = {sm:{} for sm in sample_names}
+    for fl in files :
+        if fl.endswith(".hapcut2") :
+            sample = fl.split(".")[0]
+            samples[sample]["vcf"] = fl
+        elif fl.endswith(".hapcut2.phased.VCF") :
+            sample = fl.split(".")[0]
+            samples[sample]["blocks"] = fl
+        else :
+            continue
+
+    return samples
+
 def parse_haplotype_blocks(phased_blocks) :
     """Reads the haplotype blocks informations from HapCut2 output"""
     data = {"bid":[],"vid":[],"al1":[],"al2":[],"chr":[],"pos":[],"ref":[],"alt":[],"gen":[],"mis":[],"inforeads":[]}
@@ -241,42 +269,54 @@ def phase(args) :
     # IO
     reference = args.FASTA[0]
     bed_file = args.BED[0]
-    phased_blocks_hapcut2 = args.HAPCUT2[0]
-    phased_vcf = args.VCF[0]
-    output = args.output[0]
+    phase_outdir = args.VCF[0]
+    outdir = args.outdir[0]
 
     print("# Phasing tool")
     print("Haploid reference:\t{0}".format(reference))
     print("Regions to phase:\t{0}".format(bed_file))
-    print("HapCut2 phased VCF:\t{0}".format(phased_vcf))
-    print("HapCut2 phased blocks:\t{0}".format(phased_blocks_hapcut2))
-    print("Output path:\t\t{0}".format(output))
+    print("Phase vcf output directory:\t{0}".format(phase_outdir))
+    print("Output directory path:\t\t{0}".format(outdir))
 
-    log("Reading reference...")
+    log("Reading reference...") # common
     refseqs = parse_fasta_generic(reference)
     lengths = {k:len(v) for k,v in refseqs.items()}
 
-    log("Parsing .bed file...")
+    log("Parsing .bed file...") # common
     regions = parse_bed(bed_file)
 
-    log("Parsing phased blocks file...")
-    df, haplotypes = parse_haplotype_blocks(phased_blocks_hapcut2)
+    log("Parsing samples...") # common
+    samples = parse_samples(phase_outdir) # format: {sample: {vcf:vcf, blocks:blocks}}
 
-    log("Checking phaseable regions...")
-    regions_to_phase = find_overlaps(regions, haplotypes)
+    i = 1
+    t = len(samples)
+    for sm, input_files in samples.items() :
 
-    log("Getting regions to phase...")
-    all_r_df = make_regions_df_for_merge(regions_to_phase, lengths)
-    all_r_df_only_hap = all_r_df.query("ishap > 0")
-    only_phased = pd.merge(df, all_r_df_only_hap, on=["chr", "pos"], how="right")
+        phased_blocks_hapcut2 = input_files["blocks"]
+        phased_vcf = input_files["vcf"]
 
-    log("Outputting haploid fasta of regions to phase...")
-    outfa = "{}.fa".format(output)
-    new_seqs = write_new_fasta(outfa, refseqs, only_phased)
+        log("{} ({}/{}): Parsing phased blocks file...".format(sm, i, t)) # sample wise
+        df, haplotypes = parse_haplotype_blocks(phased_blocks_hapcut2)
 
-    log("Writing a new phased .VCF with per-region information...")
-    vcf_out = "{}.vcf".format(output) # Need be uncompressed
-    write_new_vcf(vcf_out, phased_vcf, new_seqs, only_phased)
+        log("{} ({}/{}): Checking phaseable regions...".format(sm, i, t)) # sample wise
+        regions_to_phase = find_overlaps(regions, haplotypes)
 
-    log("Running bcftools consensus...")
-    run_bcftools(output, outfa, vcf_out)
+        log("{} ({}/{}): Getting regions to phase...".format(sm, i, t)) # sample wise
+        all_r_df = make_regions_df_for_merge(regions_to_phase, lengths)
+        all_r_df_only_hap = all_r_df.query("ishap > 0")
+        only_phased = pd.merge(df, all_r_df_only_hap, on=["chr", "pos"], how="right")
+
+        log("{} ({}/{}): Outputting haploid fasta of regions to phase...".format(sm, i, t)) # sample wise
+        #outfa = "{}.fa".format(output)
+        fa_out = os.path.join(outdir, sm+".fa")
+        new_seqs = write_new_fasta(fa_out, refseqs, only_phased)
+
+        log("{} ({}/{}): Writing a new phased .VCF with per-region information...".format(sm, i, t)) # sample wise
+        #vcf_out = "{}.vcf".format(output) # Need be uncompressed
+        vcf_out = os.path.join(outdir, sm + ".phased.vcf") # Need be uncompressed
+        write_new_vcf(vcf_out, phased_vcf, new_seqs, only_phased)
+
+        log("{} ({}/{}): Running bcftools consensus...".format(sm, i, t)) # sample wise
+        run_bcftools(output, fa_out, vcf_out)
+        
+        i += 1

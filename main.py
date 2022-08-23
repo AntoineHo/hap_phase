@@ -98,9 +98,8 @@ def main() :
     pha = subparsers.add_parser("phase", help='Using an haploid reference, a phased .vcf and a region .bed file, outputs phased sequences.')
     pha.add_argument('FASTA',    nargs=1, type=str, help="<STRING> A fasta file containing the HAPLOID reference genome.")
     pha.add_argument('BED',      nargs=1, type=str, help="<STRING> A bed file containing the regions to try to phase.")
-    pha.add_argument('VCF',      nargs=1, type=str, help="<STRING> A phased VCF output of HapCut2.")
-    pha.add_argument('HAPCUT2',  nargs=1, type=str, help="<STRING> A phased block file output of HapCut2.")
-    pha.add_argument('-o','--output', nargs=1, type=str, default=['out'],help="<STRING> prefix for the output files. Default: %(default)s")
+    pha.add_argument('VCF',      nargs=1, type=str, help="<STRING> Phased VCF and blocks output directory of HapCut2 (created at 'phase_vcf' step).")
+    pha.add_argument('-o','--outdir', nargs=1, type=str, default=['out'],help="<STRING> prefix for the output files. Default: %(default)s")
     pha.set_defaults(func=phase)
 
     # Get one fasta file per phased block
