@@ -91,7 +91,7 @@ def main() :
     ext.add_argument('N',       nargs=1, type=int, help="<INT> Minimum number of samples phased to filter the regions.")
     ext.add_argument('REF',     nargs=1, type=str, help="<STRING> path to the fasta reference file.")
     ext.add_argument('-ml','--min-length',   nargs=1, type=int, default=[100],   help="<INT> Minimum length of phased region. Default: >= %(default)s")
-    ext.add_argument('-o','--output',        nargs=1, type=str, default=['out'], help="<STRING> name for the output file. Default: %(default)s")
+    ext.add_argument('-o','--output',        nargs=1, type=str, default=['out.bed'], help="<STRING> name for the output file. Default: %(default)s")
     ext.set_defaults(func=extract)
 
     # Obtain a phased vcf from haploid reference using haplotype blocks

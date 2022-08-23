@@ -59,6 +59,7 @@ def maximally_phased_dataset(bed_dir, output, lengths, n, min_length=100) :
     for i, file in enumerate(bed_files) :
         regions = parse_bed(file)
         for r in regions :
+            print(r)
             arrays[r[0]][r[1]:r[2]] += 1
 
     new_bed_data = []
