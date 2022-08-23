@@ -187,10 +187,12 @@ def write_new_vcf(output, phased_vcf, new_sequences, only_phased) : # Need pysam
 
     total = len(gb)
     tenpercent = int(0.1*total)
+
     i = 0
     for n, blocks in gb :
-        if i % tenpercent == 0 :
-            print("Processed {} / {} blocks".format(i, total))
+        if tenpercent > 0 :
+            if i % tenpercent == 0 :
+                print("Processed {} / {} blocks".format(i, total))
 
         start = blocks["pos"].min()
         end = blocks["pos"].max()
@@ -208,11 +210,11 @@ def write_new_vcf(output, phased_vcf, new_sequences, only_phased) : # Need pysam
 
     log("Writing new .vcf file...")
     for i, block in enumerate(new_blocks) :
-        if i % tenpercent == 0 :
-            print("Processed {} / {} blocks".format(i, total))
-        #print(block)
+        if tenpercent > 0 :
+            if i % tenpercent == 0 :
+                print("Processed {} / {} blocks".format(i, total))
+
         for n, row in block.iterrows() :
-            #print(row)
             nr = vcf_out.new_record()
             nr = row["record"].copy()
             nr.translate(vcf_out.header)
